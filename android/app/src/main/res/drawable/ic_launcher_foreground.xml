@@ -1,0 +1,8 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Мемориальная доска: прямоугольник с двумя строками надписи -->
+    <path android:fillColor="#E8E1D4" android:pathData="M30,38h48v32h-48z" />
+    <path android:fillColor="#2B2A28" android:pathData="M36,48h36v3h-36z" />
+    <path android:fillColor="#2B2A28" android:pathData="M36,57h24v3h-24z" />
+</vector>

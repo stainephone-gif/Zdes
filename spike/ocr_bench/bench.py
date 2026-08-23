@@ -21,10 +21,10 @@ import random
 import statistics
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from engines import ENGINES              # noqa: E402
-from matcher import Candidate, rank      # noqa: E402
+from zdes.matcher import Candidate, rank   # noqa: E402
+from zdes.ocr import ENGINES               # noqa: E402
 
 
 def load_truth(path):
