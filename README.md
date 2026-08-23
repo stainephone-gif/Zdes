@@ -2,7 +2,26 @@
 
 Мобильное приложение (Android), которое распознаёт мемориальную табличку на доме по фотографии и открывает материалы о человеке: кто он, чем важен, как связан с этим домом, где прочитать его книги или послушать его музыку — и куда двигаться дальше по связям.
 
-**Статус:** проектирование MVP. Кода пока нет.
+**Статус:** есть работающий сквозной срез — импорт данных, бэкенд и Android-приложение,
+которое снимает табличку и открывает карточку человека.
+
+## Как запустить
+
+```bash
+pip install -r requirements.txt
+python3 tools/seed_demo.py --db data/demo.sqlite3        # демо-база из 4 табличек
+ZDES_DB=data/demo.sqlite3 uvicorn zdes.api:app --host 0.0.0.0 --port 8000
+python3 tests/test_pipeline.py                           # 12 проверок
+```
+
+Приложение — открыть папку `android` в Android Studio, подробности в
+[android/README.md](android/README.md).
+
+Настоящий импорт вместо демо-базы:
+
+```bash
+python3 tools/import_cli.py --corridor prechistenka
+```
 
 ## Документация
 
@@ -14,6 +33,19 @@
 | [docs/04-ADR-001-raspoznavanie.md](docs/04-ADR-001-raspoznavanie.md) | Решение по распознаванию: каскад гео-фильтр → PaddleOCR → мультимодальная модель, с обоснованием и отклонёнными вариантами |
 | [docs/05-references.md](docs/05-references.md) | Референсы: что берём у Vivino, Shazam, Smartify и где они вводят в заблуждение |
 | [docs/06-content-plan.md](docs/06-content-plan.md) | Контент-план при одном редакторе: пересчёт объёма базы, коридоры, чек-лист верификации, календарь |
+
+## Код
+
+| Что | Где |
+|---|---|
+| Разбор надписи и сопоставление персоны | [zdes/matcher.py](zdes/matcher.py) |
+| Выгрузка из OpenStreetMap | [zdes/osm.py](zdes/osm.py) |
+| Обогащение из Wikidata, поиск персоны по надписи | [zdes/wikidata.py](zdes/wikidata.py) |
+| Импорт: связи, ссылки, отчёт о трудоёмкости | [zdes/importer.py](zdes/importer.py) |
+| HTTP-API | [zdes/api.py](zdes/api.py) |
+| Движки распознавания | [zdes/ocr.py](zdes/ocr.py) |
+| Приложение Android | [android/](android/) |
+| Регрессия | [tests/test_pipeline.py](tests/test_pipeline.py) |
 
 ## Спайк
 

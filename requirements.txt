@@ -1,0 +1,10 @@
+# Импорт и бэкенд
+requests>=2.31
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+
+# Распознавание — ставится по выбору, см. docs/04-ADR-001-raspoznavanie.md
+anthropic>=0.40      # мультимодальный фолбэк
+# paddlepaddle ; paddleocr    # основной движок, ставится отдельно
+# pytesseract ; pillow        # локальная альтернатива

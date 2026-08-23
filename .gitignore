@@ -37,3 +37,7 @@ __pycache__/
 photos/
 bench_results.csv
 ground_truth.csv
+data/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
