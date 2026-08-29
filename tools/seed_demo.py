@@ -11,6 +11,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from dataclasses import replace  # noqa: E402
+
 from zdes import db, importer, osm, wikidata  # noqa: E402
 
 PEOPLE = {
@@ -66,7 +68,21 @@ def main():
     ap.add_argument('--db', default='data/demo.sqlite3')
     ap.add_argument('--keep-draft', action='store_true',
                     help='не публиковать записи — как после настоящего импорта')
+    ap.add_argument('--here', metavar='ШИРОТА,ДОЛГОТА',
+                    help='разложить демо-таблички вокруг указанной точки — чтобы '
+                         'проверять приложение не в центре Москвы, а там, где вы есть')
     args = ap.parse_args()
+
+    plaques = list(PLAQUES)
+    if args.here:
+        lat0, lon0 = (float(v) for v in args.here.split(','))
+        # Сохраняем взаимное расположение табличек, переносим их центр к вам:
+        # иначе связи «в соседнем доме» перестанут быть правдой
+        clat = sum(p.lat for p in plaques) / len(plaques)
+        clon = sum(p.lon for p in plaques) / len(plaques)
+        plaques = [replace(p, lat=p.lat - clat + lat0, lon=p.lon - clon + lon0)
+                   for p in plaques]
+        print(f'\n  Таблички перенесены к точке {lat0}, {lon0}')
 
     path = Path(args.db)
     if path.exists():
@@ -74,7 +90,7 @@ def main():
     conn = db.connect(path)
 
     fetchers = {
-        'osm': lambda bbox: list(PLAQUES),
+        'osm': lambda bbox: plaques,
         'persons': lambda qids: {q: PEOPLE[q] for q in qids if q in PEOPLE},
         'search': lambda query, limit=6: list(PEOPLE),
         'works': lambda qids: list(WORKS),
@@ -93,7 +109,12 @@ def main():
 
     published = conn.execute("SELECT COUNT(*) FROM plaque WHERE status='published'").fetchone()[0]
     print(f'\n  Демо-база готова: {path}, опубликовано {published} табличек.')
-    print(f'  Запуск:  ZDES_DB={path} uvicorn zdes.api:app --host 0.0.0.0 --port 8000\n')
+    print(f'  Запуск:  ZDES_DB={path} uvicorn zdes.api:app --host 0.0.0.0 --port 8000')
+    first = conn.execute("SELECT lat, lon FROM plaque WHERE status='published' "
+                         'ORDER BY id LIMIT 1').fetchone()
+    if first:
+        print(f'  Координаты для проверки (эмулятор → Extended controls → Location):'
+              f'\n    широта {first[0]}   долгота {first[1]}\n')
     return 0
 
 

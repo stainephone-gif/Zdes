@@ -218,8 +218,12 @@ async def recognize(
                 radius = CONFIG['radius_fallback_m']
                 found = db.plaques_near(c, lat, lon, radius)
         else:
+            # Координат нет — работаем по всей базе. Расстояние ставим
+            # нейтральное: нулевое означало бы «стоим вплотную ко всем сразу»
+            # и завышало бы уверенность там, где мы как раз не уверены.
             radius = CONFIG['radius_fallback_m']
-            found = [(0.0, r) for r in c.execute(
+            neutral = radius / 2
+            found = [(neutral, r) for r in c.execute(
                 "SELECT * FROM plaque WHERE status='published'")]
 
         candidates, by_id = [], {}
